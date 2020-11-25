@@ -1,7 +1,7 @@
 const assert = require('assert')
 
 module.exports = function ExpiringInvertedPromise({timeoutMs, timeoutError, onTimeout}) {
-    assert(onTimeout == null ? true : typeof onTimeout === 'function', 'onTimeout must be afunction')
+    assert(onTimeout == null ? true : typeof onTimeout === 'function', 'onTimeout must be a function')
     assert(timeoutMs == null ? true : typeof timeoutMs === 'number', 'timeoutMs must be a number')
     var res
     var rej
@@ -11,6 +11,8 @@ module.exports = function ExpiringInvertedPromise({timeoutMs, timeoutError, onTi
         res = resolve
         rej = reject
     })
+    p.reject = rej
+    p.resolve = res
 
     if (timeoutMs) {
         timeoutHandle = setTimeout(() => {
@@ -18,17 +20,8 @@ module.exports = function ExpiringInvertedPromise({timeoutMs, timeoutError, onTi
             p.reject(timeoutError)
         }, timeoutMs);
     }
-
-    p.resolve = (val) => {
-        clearTimeout(timeoutHandle)
-        return res(val)
-    }
-
-    p.reject = (err) => {
-        clearTimeout(timeoutHandle)
-        return rej(err)
-    }
+    
+    p.finally(() => clearTimeout(timeoutHandle))
 
     return p
   }
-
