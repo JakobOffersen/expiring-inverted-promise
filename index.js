@@ -1,4 +1,4 @@
-const assert = require('assert')
+const assert = require('nanoassert')
 
 module.exports = function ExpiringInvertedPromise({timeoutMs, timeoutError, onTimeout}) {
     assert(onTimeout == null ? true : typeof onTimeout === 'function', 'onTimeout must be a function')
@@ -20,7 +20,7 @@ module.exports = function ExpiringInvertedPromise({timeoutMs, timeoutError, onTi
             p.reject(timeoutError)
         }, timeoutMs);
     }
-    
+
     p.finally(() => clearTimeout(timeoutHandle))
 
     return p
